@@ -1,0 +1,10 @@
+name: gradient
+version: '${project.version}'
+main: org.garper.gradient.Main
+api-version: 1.19
+authors: [ Garper_ ]
+commands:
+  gradient:
+    description: apply a gradient
+    usage: /<command>
+    aliases: [grad]
