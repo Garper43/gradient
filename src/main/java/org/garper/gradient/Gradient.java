@@ -2,42 +2,34 @@ package org.garper.gradient;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extension.factory.PatternFactory;
-import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.MaskIntersection;
-import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.factory.CuboidRegionFactory;
-import com.sk89q.worldedit.session.SessionManager;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.checkerframework.checker.units.qual.A;
-import sun.awt.OSInfo;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
 
 public class Gradient {
-    private ArrayList<Material> materials = new ArrayList<>();
-    private float verticalSpread = 1;
-    private boolean inverted = false;
+    private ArrayList<Material> materials;
+    private float verticalSpread;
+    private int verticalShift;
+    private boolean inverted;
 
     public Gradient() {
+        materials = new ArrayList<>();
+        verticalSpread = 1;
+        verticalShift = 0;
+        inverted = false;
     }
 
-    public Gradient(int radius, ArrayList<Material> materials, float horizontalSpread, boolean inverted) {
+    public Gradient(ArrayList<Material> materials, float horizontalSpread, int verticalShift, boolean inverted) {
         this.materials = materials;
         this.verticalSpread = horizontalSpread;
+        this.verticalShift = verticalShift;
         this.inverted = inverted;
     }
 
@@ -58,10 +50,16 @@ public class Gradient {
         this.verticalSpread = horizontalSpread;
     }
 
+    public int getVerticalShift() {
+        return verticalShift;
+    }
+    public void setVerticalShift(int verticalShift) {
+        this.verticalShift = verticalShift;
+    }
+
     public boolean isInverted() {
         return inverted;
     }
-
     public void setInverted(boolean inverted) {
         this.inverted = inverted;
     }
@@ -74,6 +72,7 @@ public class Gradient {
         Random rand = new Random();
         int height = region.getHeight();
 
+        //edit blocks
         region.forEach((vector) -> {
             BlockVector3 v3 = (BlockVector3) vector;
 
@@ -85,7 +84,10 @@ public class Gradient {
 
             if(block.getType() != Material.AIR && (mask == null || mask.test(v3))) {
                 //choose material
-                int index = (int) ( (double) (relY)/(height)*materials.size() + verticalSpread*(rand.nextDouble() - 0.5) );
+                Random rand2 = new Random();
+                rand2.setSeed(Long.parseLong("" + (x*z+z*z/x) ));
+                int shiftVal = 2*(rand2.nextInt(verticalShift + 1) - verticalShift/2);
+                int index = (int) ( (double) (relY + shiftVal)/(height)*materials.size() + verticalSpread*(rand.nextDouble() - 0.5));
 
                 if(index < 0) {
                     index = 0;

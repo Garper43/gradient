@@ -43,7 +43,7 @@ public class GradientCommand implements CommandExecutor {
         Player player = (Player) sender;
 
         //check if too many arguments
-        if(args.length > 3) {
+        if(args.length > 4) {
             player.sendMessage("§4Too many arguments");
             return false;
         }
@@ -65,9 +65,14 @@ public class GradientCommand implements CommandExecutor {
             //read spread
             gradient.setVerticalSpread(Float.parseFloat(args[1]));
 
+            //read vertical shift
+            if(args.length >= 3) {
+                gradient.setVerticalShift(Integer.parseInt(args[2]));
+            }
+
             //check whether inverted
-            if(args.length == 3) {
-                if(args[2].equals("-i")) {
+            if(args.length == 4) {
+                if(args[3].equals("-i")) {
                     gradient.setInverted(true);
                 } else {
                     player.sendMessage("§4Invalid flag");
